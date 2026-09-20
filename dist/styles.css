@@ -74,7 +74,7 @@ label { display: block; margin-bottom: 10px; font-size: 12px; color: #c6d3e8; }
 
 .site { animation: site-in .65s ease both; }
 @keyframes site-in { from { opacity: 0; } to { opacity: 1; } }
-.topbar { position: sticky; top: 0; z-index: 20; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 20px; width: min(100% - 80px, 1280px); margin: 0 auto; padding: 22px 0; background: #070b18df; backdrop-filter: blur(20px); border-bottom: 1px solid #a7bed40c; }
+.topbar { position: sticky; top: 0; z-index: 20; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 20px; width: 100%; margin: 0; padding: 22px max(40px, calc((100% - 1280px) / 2)); background: #070b18df; backdrop-filter: blur(20px); border-bottom: 1px solid #a7bed40c; }
 .brand { display: flex; align-items: center; gap: 12px; text-decoration: none; font-size: 15px; letter-spacing: .02em; }
 .brand-symbol { font-size: 35px; line-height: 1; color: var(--pink); }
 .brand small { display: block; font-size: 8px; letter-spacing: .16em; color: #7c8ca7; margin-top: 1px; }
@@ -202,7 +202,8 @@ footer p { margin: 0; }
 .credits-page .cosmic-button { margin-top: 24px; }
 
 @media (max-width: 1100px) {
-  .topbar, main, footer { width: calc(100% - 48px); }
+  .topbar { padding-inline: 24px; }
+  main, footer { width: calc(100% - 48px); }
   .hero { gap: 30px; }
   .globe-panel { height: 580px; }
   .location-list { right: 14px; left: 14px; gap: 7px; }
@@ -224,8 +225,8 @@ footer p { margin: 0; }
 }
 @media (max-width: 640px) {
   html { scroll-padding-top: 88px; }
-  .topbar, main, footer { width: calc(100% - 36px); }
-  .topbar { grid-template-columns: 1fr auto; padding: 18px 0; backdrop-filter: none; background: #070b18f5; }
+  main, footer { width: calc(100% - 36px); }
+  .topbar { grid-template-columns: 1fr auto; padding: 18px; backdrop-filter: none; background: #070b18f5; }
   .brand { font-size: 13px; gap: 8px; }
   .brand-symbol { font-size: 29px; }
   .header-actions { gap: 15px; }
