@@ -8,6 +8,8 @@ const privateDir = resolve(root, ".private");
 const contentPath = resolve(privateDir, "content.json");
 const passwordPath = resolve(privateDir, "password.txt");
 const outputPath = resolve(root, "dist", "content.enc.json");
+const loveProjectPath = resolve(privateDir, "projects", "love.html");
+const loveProjectOutputPath = resolve(root, "dist", "projects", "love", "content.enc.json");
 const iterations = 310_000;
 
 await mkdir(privateDir, { recursive: true });
@@ -25,25 +27,30 @@ if (password.length < 12) {
   throw new Error("密码至少需要 12 个字符；建议使用 16 个以上随机字符。 ");
 }
 
-const plaintext = await readFile(contentPath);
-JSON.parse(plaintext.toString("utf8"));
+async function encryptFile(sourcePath, destinationPath) {
+  const plaintext = await readFile(sourcePath);
+  const salt = randomBytes(16);
+  const iv = randomBytes(12);
+  const key = pbkdf2Sync(password, salt, iterations, 32, "sha256");
+  const cipher = createCipheriv("aes-256-gcm", key, iv);
+  const ciphertext = Buffer.concat([cipher.update(plaintext), cipher.final()]);
+  const tag = cipher.getAuthTag();
+  const payload = {
+    version: 1,
+    algorithm: "AES-GCM",
+    kdf: "PBKDF2-SHA-256",
+    iterations,
+    salt: salt.toString("base64"),
+    iv: iv.toString("base64"),
+    data: Buffer.concat([ciphertext, tag]).toString("base64")
+  };
 
-const salt = randomBytes(16);
-const iv = randomBytes(12);
-const key = pbkdf2Sync(password, salt, iterations, 32, "sha256");
-const cipher = createCipheriv("aes-256-gcm", key, iv);
-const ciphertext = Buffer.concat([cipher.update(plaintext), cipher.final()]);
-const tag = cipher.getAuthTag();
+  await mkdir(dirname(destinationPath), { recursive: true });
+  await writeFile(destinationPath, `${JSON.stringify(payload)}\n`, "utf8");
+}
 
-const payload = {
-  version: 1,
-  algorithm: "AES-GCM",
-  kdf: "PBKDF2-SHA-256",
-  iterations,
-  salt: salt.toString("base64"),
-  iv: iv.toString("base64"),
-  data: Buffer.concat([ciphertext, tag]).toString("base64")
-};
-
-await writeFile(outputPath, `${JSON.stringify(payload)}\n`, "utf8");
-console.log("加密内容已更新，可以安全发布 dist 文件夹。");
+const content = await readFile(contentPath);
+JSON.parse(content.toString("utf8"));
+await encryptFile(contentPath, outputPath);
+await encryptFile(loveProjectPath, loveProjectOutputPath);
+console.log("主页和项目密文已更新，可以安全发布 dist 文件夹。");

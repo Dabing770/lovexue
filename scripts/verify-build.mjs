@@ -6,25 +6,40 @@ import { fileURLToPath } from "node:url";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const password = (await readFile(resolve(root, ".private", "password.txt"), "utf8")).trim();
-const payload = JSON.parse(await readFile(resolve(root, "dist", "content.enc.json"), "utf8"));
-const encrypted = Buffer.from(payload.data, "base64");
-const ciphertext = encrypted.subarray(0, -16);
-const tag = encrypted.subarray(-16);
-const key = pbkdf2Sync(password, Buffer.from(payload.salt, "base64"), payload.iterations, 32, "sha256");
-const decipher = createDecipheriv("aes-256-gcm", key, Buffer.from(payload.iv, "base64"));
-decipher.setAuthTag(tag);
-const plaintext = Buffer.concat([decipher.update(ciphertext), decipher.final()]).toString("utf8");
-const content = JSON.parse(plaintext);
+async function decryptFile(path) {
+  const payload = JSON.parse(await readFile(path, "utf8"));
+  const encrypted = Buffer.from(payload.data, "base64");
+  const ciphertext = encrypted.subarray(0, -16);
+  const tag = encrypted.subarray(-16);
+  const key = pbkdf2Sync(password, Buffer.from(payload.salt, "base64"), payload.iterations, 32, "sha256");
+  const decipher = createDecipheriv("aes-256-gcm", key, Buffer.from(payload.iv, "base64"));
+  decipher.setAuthTag(tag);
 
-assert.equal(payload.algorithm, "AES-GCM");
-assert.ok(payload.iterations >= 300_000);
+  return {
+    payload,
+    plaintext: Buffer.concat([decipher.update(ciphertext), decipher.final()]).toString("utf8")
+  };
+}
+
+const homepage = await decryptFile(resolve(root, "dist", "content.enc.json"));
+const content = JSON.parse(homepage.plaintext);
+const loveProject = await decryptFile(resolve(root, "dist", "projects", "love", "content.enc.json"));
+
+assert.equal(homepage.payload.algorithm, "AES-GCM");
+assert.ok(homepage.payload.iterations >= 300_000);
 assert.equal(content.people.length, 2);
 assert.ok(content.stories.length >= 1);
+assert.equal(content.projects.length, 1);
+assert.match(loveProject.plaintext, /<title>Love Memories · 爱的回忆<\/title>/);
+assert.equal(loveProject.payload.algorithm, "AES-GCM");
+assert.ok(loveProject.payload.iterations >= 300_000);
 
 const privateTerms = [
   content.siteTitle,
   ...content.people.flatMap((person) => [person.name, person.city]),
-  ...content.stories.flatMap((story) => [story.title, story.text])
+  ...content.stories.flatMap((story) => [story.title, story.text]),
+  ...content.projects.flatMap((project) => [project.name, project.description]),
+  "<h1>Our Love</h1>"
 ];
 const publicFiles = (await readdir(resolve(root, "dist"), { recursive: true, withFileTypes: true }))
   .filter((entry) => entry.isFile() && entry.name !== "content.enc.json")
@@ -37,4 +52,4 @@ for (const term of privateTerms) {
   assert.ok(!publicText.includes(term), `发布文件中发现私人明文：${term}`);
 }
 
-console.log("验证通过：密文可解密，发布文件未发现指定私人明文。");
+console.log("验证通过：主页与项目密文可解密，发布文件未发现指定私人明文。");

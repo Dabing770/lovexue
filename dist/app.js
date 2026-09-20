@@ -212,13 +212,18 @@ function renderProjects(projects) {
     description.textContent = project.description;
     article.append(number, title, description);
 
-    if (project.url && /^https?:\/\//i.test(project.url)) {
-      const link = document.createElement("a");
-      link.href = project.url;
-      link.target = "_blank";
-      link.rel = "noopener noreferrer";
-      link.textContent = "打开项目 ↗";
-      article.append(link);
+    try {
+      const projectUrl = new URL(project.url, location.href);
+      if (projectUrl.protocol === "http:" || projectUrl.protocol === "https:") {
+        const link = document.createElement("a");
+        link.href = projectUrl.href;
+        link.target = "_blank";
+        link.rel = "noopener noreferrer";
+        link.textContent = "打开项目 ↗";
+        article.append(link);
+      }
+    } catch {
+      // 无效链接不显示，避免把错误地址带到页面上。
     }
     grid.append(article);
   });

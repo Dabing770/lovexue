@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#080311" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; media-src 'self' blob:; connect-src 'self' https://cdn.jsdelivr.net https://storage.googleapis.com; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'" />
+    <title>加密项目 · Our Orbit</title>
+    <style>
+      * { box-sizing: border-box; }
+      body {
+        min-height: 100vh;
+        margin: 0;
+        display: grid;
+        place-items: center;
+        color: #fff;
+        font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+        background:
+          radial-gradient(circle at 20% 20%, rgba(185, 87, 255, .22), transparent 35%),
+          radial-gradient(circle at 80% 70%, rgba(255, 75, 154, .2), transparent 32%),
+          #080311;
+      }
+      main {
+        width: min(90vw, 430px);
+        padding: 38px 32px;
+        text-align: center;
+        border: 1px solid rgba(255, 255, 255, .16);
+        border-radius: 24px;
+        background: rgba(18, 9, 34, .78);
+        box-shadow: 0 24px 80px rgba(0, 0, 0, .45);
+        backdrop-filter: blur(18px);
+      }
+      .star { color: #ff8fc7; font-size: 30px; }
+      h1 { margin: 14px 0 10px; font-size: clamp(24px, 6vw, 34px); }
+      p { color: #cfc5dd; line-height: 1.7; }
+      label { display: block; margin: 24px 0 8px; text-align: left; color: #eee7f6; }
+      .password-row { display: flex; gap: 8px; }
+      input, button {
+        min-height: 48px;
+        border-radius: 12px;
+        font: inherit;
+      }
+      input {
+        width: 100%;
+        padding: 0 14px;
+        color: #fff;
+        border: 1px solid rgba(255, 255, 255, .2);
+        background: rgba(255, 255, 255, .07);
+        outline: none;
+      }
+      input:focus { border-color: #ff8fc7; }
+      button { cursor: pointer; }
+      #reveal {
+        flex: 0 0 auto;
+        padding: 0 14px;
+        color: #e8deef;
+        border: 1px solid rgba(255, 255, 255, .18);
+        background: transparent;
+      }
+      #unlock {
+        width: 100%;
+        margin-top: 12px;
+        color: #1c0b20;
+        border: 0;
+        font-weight: 700;
+        background: linear-gradient(135deg, #ff8fc7, #c39bff);
+      }
+      #unlock:disabled { cursor: wait; opacity: .7; }
+      #status { min-height: 24px; margin: 12px 0 0; color: #ffb7d6; font-size: 14px; }
+      a { color: #cbb7ff; }
+    </style>
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+          "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/",
+          "@mediapipe/tasks-vision": "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.3/+esm"
+        }
+      }
+    </script>
+    <script src="./loader.js" defer></script>
+  </head>
+  <body>
+    <main>
+      <div class="star" aria-hidden="true">✦</div>
+      <h1>打开我们的爱心</h1>
+      <p>项目内容已经加密，请输入与主页相同的密码。</p>
+      <form id="unlock-form">
+        <label for="password">专属密码</label>
+        <div class="password-row">
+          <input id="password" type="password" autocomplete="current-password" minlength="12" required autofocus />
+          <button id="reveal" type="button" aria-pressed="false">显示</button>
+        </div>
+        <button id="unlock" type="submit">解锁项目</button>
+        <p id="status" role="status" aria-live="polite"></p>
+      </form>
+      <a href="../../">返回主页</a>
+    </main>
+  </body>
+</html>
