@@ -30,6 +30,7 @@ assert.ok(homepage.payload.iterations >= 300_000);
 assert.equal(content.people.length, 2);
 assert.ok(content.stories.length >= 1);
 assert.equal(content.projects.length, 1);
+assert.match(content.projects[0].url, /^https:\/\//);
 assert.match(loveProject.plaintext, /<title>Love Memories · 爱的回忆<\/title>/);
 assert.equal(loveProject.payload.algorithm, "AES-GCM");
 assert.ok(loveProject.payload.iterations >= 300_000);
