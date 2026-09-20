@@ -3,72 +3,10 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#080311" />
+    <meta name="theme-color" content="#070b18" />
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; media-src 'self' blob:; connect-src 'self' https://cdn.jsdelivr.net https://storage.googleapis.com; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'" />
     <title>加密项目 · Our Orbit</title>
-    <style>
-      * { box-sizing: border-box; }
-      body {
-        min-height: 100vh;
-        margin: 0;
-        display: grid;
-        place-items: center;
-        color: #fff;
-        font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
-        background:
-          radial-gradient(circle at 20% 20%, rgba(185, 87, 255, .22), transparent 35%),
-          radial-gradient(circle at 80% 70%, rgba(255, 75, 154, .2), transparent 32%),
-          #080311;
-      }
-      main {
-        width: min(90vw, 430px);
-        padding: 38px 32px;
-        text-align: center;
-        border: 1px solid rgba(255, 255, 255, .16);
-        border-radius: 24px;
-        background: rgba(18, 9, 34, .78);
-        box-shadow: 0 24px 80px rgba(0, 0, 0, .45);
-        backdrop-filter: blur(18px);
-      }
-      .star { color: #ff8fc7; font-size: 30px; }
-      h1 { margin: 14px 0 10px; font-size: clamp(24px, 6vw, 34px); }
-      p { color: #cfc5dd; line-height: 1.7; }
-      label { display: block; margin: 24px 0 8px; text-align: left; color: #eee7f6; }
-      .password-row { display: flex; gap: 8px; }
-      input, button {
-        min-height: 48px;
-        border-radius: 12px;
-        font: inherit;
-      }
-      input {
-        width: 100%;
-        padding: 0 14px;
-        color: #fff;
-        border: 1px solid rgba(255, 255, 255, .2);
-        background: rgba(255, 255, 255, .07);
-        outline: none;
-      }
-      input:focus { border-color: #ff8fc7; }
-      button { cursor: pointer; }
-      #reveal {
-        flex: 0 0 auto;
-        padding: 0 14px;
-        color: #e8deef;
-        border: 1px solid rgba(255, 255, 255, .18);
-        background: transparent;
-      }
-      #unlock {
-        width: 100%;
-        margin-top: 12px;
-        color: #1c0b20;
-        border: 0;
-        font-weight: 700;
-        background: linear-gradient(135deg, #ff8fc7, #c39bff);
-      }
-      #unlock:disabled { cursor: wait; opacity: .7; }
-      #status { min-height: 24px; margin: 12px 0 0; color: #ffb7d6; font-size: 14px; }
-      a { color: #cbb7ff; }
-    </style>
+    <link rel="stylesheet" href="./unlock.css?v=20260920-ui" />
     <script type="importmap">
       {
         "imports": {
@@ -81,20 +19,44 @@
     <script src="./loader.js" defer></script>
   </head>
   <body>
-    <main>
-      <div class="star" aria-hidden="true">✦</div>
-      <h1>打开我们的爱心</h1>
-      <p>项目内容已经加密，请输入与主页相同的密码。</p>
+    <div class="sky-orbit orbit-one" aria-hidden="true"></div>
+    <div class="sky-orbit orbit-two" aria-hidden="true"></div>
+    <header class="page-header">
+      <a class="brand" href="../../" aria-label="Our Orbit，返回主页">
+        <svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="9"/><ellipse cx="20" cy="20" rx="19" ry="7" transform="rotate(-35 20 20)"/><circle class="brand-star" cx="33" cy="11" r="2.5"/></svg>
+        OUR ORBIT
+      </a>
+      <span class="privacy-pill"><span aria-hidden="true"></span> 仅属于我们</span>
+    </header>
+    <main aria-labelledby="project-title">
+      <div class="card-glow" aria-hidden="true"></div>
+      <div class="heart-planet" aria-hidden="true">
+        <div class="planet-ring"></div>
+        <div class="planet-core"><svg viewBox="0 0 48 48"><path d="M24 38S7 28 7 16.5C7 7.8 18 5.1 24 13c6-7.9 17-5.2 17 3.5C41 28 24 38 24 38Z"/></svg></div>
+        <span class="planet-star">✧</span>
+      </div>
+      <p class="eyebrow">A LITTLE UNIVERSE, JUST FOR US</p>
+      <h1 id="project-title">打开我们的爱心</h1>
+      <p class="intro">把想念装进一颗爱心，<br />让每一张照片，都有自己的星光。</p>
+      <div class="card-divider" aria-hidden="true"><span>✦</span></div>
       <form id="unlock-form">
         <label for="password">专属密码</label>
         <div class="password-row">
-          <input id="password" type="password" autocomplete="current-password" minlength="12" required autofocus />
+          <svg class="input-lock" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10" width="14" height="11" rx="3"/><path d="M8 10V7a4 4 0 0 1 8 0v3M12 14v3"/></svg>
+          <input id="password" type="password" autocomplete="current-password" minlength="12" required autofocus placeholder="输入与主页相同的密码" aria-describedby="password-hint" />
+          <span class="input-border" aria-hidden="true"></span>
           <button id="reveal" type="button" aria-pressed="false">显示</button>
         </div>
-        <button id="unlock" type="submit">解锁项目</button>
+        <p id="password-hint" class="password-hint">用我们共同的密码，开启这一份心意。</p>
+        <button id="unlock" type="submit">
+          <span class="button-stars" aria-hidden="true"></span>
+          <span class="button-glow" aria-hidden="true"><span></span><span></span></span>
+          <span class="button-spark" aria-hidden="true">✦</span><span class="button-label">解锁项目</span><span class="button-arrow" aria-hidden="true">↗</span>
+        </button>
         <p id="status" role="status" aria-live="polite"></p>
       </form>
-      <a href="../../">返回主页</a>
+      <a class="back-link" href="../../"><span aria-hidden="true">←</span> 返回我们的星球</a>
     </main>
+    <footer class="page-footer">同一片星空，同一份心动。<span aria-hidden="true">✧</span></footer>
   </body>
 </html>

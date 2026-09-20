@@ -8,19 +8,20 @@
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'" />
     <title>Our Orbit</title>
     <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
-    <link rel="stylesheet" href="./styles.css" />
+    <link rel="stylesheet" href="./styles.css?v=20260920-ui2" />
     <script src="./vendor/d3.min.js" defer></script>
-    <script src="./app.js" defer></script>
+    <script src="./app.js?v=20260920-ui2" defer></script>
   </head>
   <body>
     <div class="star-field" aria-hidden="true"></div>
+    <div class="nebula" aria-hidden="true"></div>
 
     <section class="unlock" id="unlock" aria-labelledby="unlock-title">
       <div class="unlock-orbit" aria-hidden="true">
         <span></span>
       </div>
       <div class="unlock-card">
-        <div class="lock-mark" aria-hidden="true">✦</div>
+        <div class="lock-mark orbit-emblem" aria-hidden="true"><span>♡</span></div>
         <p class="overline">PRIVATE ORBIT</p>
         <h1 id="unlock-title">进入我们的宇宙</h1>
         <p class="unlock-copy">这段故事已经加密。请输入只有你们知道的密码。</p>
@@ -30,7 +31,7 @@
             <input id="password" name="password" type="password" autocomplete="current-password" minlength="12" required />
             <button type="button" class="reveal-button" id="reveal-password" aria-label="显示密码" aria-pressed="false">显示</button>
           </div>
-          <button class="primary-button" type="submit">解锁星球</button>
+          <button class="primary-button cosmic-button" type="submit"><span class="button-spark" aria-hidden="true">✦</span><span>解锁星球</span><span class="button-arrow" aria-hidden="true">↗</span><span class="button-loader" aria-hidden="true"></span></button>
           <p class="form-status" id="form-status" role="status" aria-live="polite"></p>
         </form>
         <p class="security-note">内容只在你的设备中解密，密码不会被发送。</p>
@@ -39,24 +40,25 @@
 
     <div class="site" id="site" hidden>
       <header class="topbar">
-        <a class="brand" href="#home" id="brand">Our Orbit</a>
+        <a class="brand" href="#home"><span class="brand-symbol" aria-hidden="true">✧</span><span><span id="brand">Our Orbit</span><small>OUR LITTLE UNIVERSE</small></span></a>
         <nav aria-label="主导航">
-          <a href="#home">首页</a>
-          <a href="#story">故事</a>
-          <a href="#projects">项目</a>
+          <a href="#home" aria-current="location"><span aria-hidden="true">⌂</span> 首页</a>
+          <a href="#story"><span aria-hidden="true">♡</span> 故事</a>
+          <a href="#projects"><span aria-hidden="true">✧</span> 项目</a>
         </nav>
-        <button class="lock-button" id="lock-site" type="button">锁定</button>
+        <div class="header-actions"><button class="motion-button" id="toggle-motion" type="button" aria-label="暂停星空动效" aria-pressed="false"><span class="switch-track" aria-hidden="true"><span></span></span><span id="motion-label">星光</span></button><button class="lock-button" id="lock-site" type="button"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="5" y="10" width="14" height="11" rx="3"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>锁定</button></div>
       </header>
 
       <main>
         <section class="hero" id="home">
           <div class="hero-copy">
+            <div class="connection-badge"><span aria-hidden="true"></span>两个人，一个小宇宙</div>
             <p class="overline" id="hero-eyebrow"></p>
             <h1 id="hero-title"></h1>
             <p class="hero-message" id="hero-message"></p>
 
             <div class="timer-panel" aria-label="恋爱时间">
-              <p class="timer-label" id="timer-label"></p>
+              <div class="timer-heading"><p class="timer-label" id="timer-label"></p><span class="tiny-heart" aria-hidden="true">♡</span></div>
               <div class="timer" id="timer">
                 <div><strong id="days">0</strong><span>天</span></div>
                 <div><strong id="hours">00</strong><span>小时</span></div>
@@ -65,32 +67,38 @@
               </div>
               <p class="timer-start" id="timer-start"></p>
             </div>
+            <div class="hero-actions"><a class="cosmic-button" href="#projects"><span aria-hidden="true">✦</span><span>看看为你做的</span><span class="button-arrow" aria-hidden="true">↗</span></a><a class="text-link" href="#story">翻开我们的故事 <span aria-hidden="true">↓</span></a></div>
           </div>
 
           <div class="globe-panel">
             <div class="globe-copy">
               <span>OUR DISTANCE</span>
               <strong id="distance">—</strong>
+              <small>地图上的距离，心里的咫尺</small>
             </div>
+            <span class="globe-badge"><span aria-hidden="true">◎</span> OUR WORLD</span>
             <canvas id="globe" aria-label="显示真实国家边界、国家名称以及两个人所在位置与连线的可旋转地球仪"></canvas>
             <div class="location-list" id="location-list"></div>
-            <p class="globe-hint">拖动查看国家地区 · 双击回到我们的位置</p>
+            <p class="globe-hint">拖动探索星球 <span>·</span> 双击回到我们的位置</p>
           </div>
         </section>
+
+        <div class="chapter-divider" aria-hidden="true"><span></span> DISTANCE MEANS SO LITTLE <span>✦</span> WHEN SOMEONE MEANS SO MUCH <span></span></div>
 
         <section class="story-section" id="story">
           <div class="section-heading">
             <p class="overline">OUR STORY</p>
-            <h2>我们的故事</h2>
+            <h2>把心动，<br /><em>写进时间里。</em></h2>
             <p>有些日期不只是日历上的数字，它们改变了两个人的世界。</p>
           </div>
           <div class="timeline" id="timeline"></div>
+          <p class="timeline-end"><span aria-hidden="true">✧</span> 故事还在继续，下一页留给我们。</p>
         </section>
 
         <section class="projects-section" id="projects">
           <div class="section-heading">
             <p class="overline">MADE FOR YOU</p>
-            <h2>我为你做的项目</h2>
+            <h2>把想念，<br /><em>做成礼物。</em></h2>
             <p>每一个项目，都是我把想念变成现实的一种方式。</p>
           </div>
           <div class="projects-grid" id="projects-grid"></div>
@@ -98,8 +106,9 @@
       </main>
 
       <footer>
-        <p id="footer-title"></p>
-        <p>同一颗星球，同一段故事。</p>
+        <div><p id="footer-title"></p><p>同一颗星球，同一段故事。</p></div>
+        <a class="back-top" href="#home" aria-label="回到首页">回到星球 <span aria-hidden="true">↑</span></a>
+        <p class="ui-credit">UI adapted from <a href="./ui-credits.html" target="_blank" rel="noopener">Uiverse ↗</a></p>
       </footer>
     </div>
   </body>

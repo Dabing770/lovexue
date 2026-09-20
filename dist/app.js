@@ -8,6 +8,35 @@ const status = $("#form-status");
 const submitButton = form.querySelector('button[type="submit"]');
 let timerId;
 let globeCleanup;
+const motionQuery = matchMedia("(prefers-reduced-motion: reduce)");
+let quietMode = motionQuery.matches;
+
+function updateMotion() {
+  document.documentElement.dataset.motion = quietMode ? "quiet" : "stars";
+  $("#toggle-motion").setAttribute("aria-pressed", String(quietMode));
+  $("#toggle-motion").setAttribute("aria-label", quietMode ? "开启星空动效" : "暂停星空动效");
+  $("#motion-label").textContent = quietMode ? "静谧" : "星光";
+}
+$("#toggle-motion").addEventListener("click", () => {
+  quietMode = !quietMode;
+  updateMotion();
+});
+motionQuery.addEventListener("change", (event) => {
+  quietMode = event.matches;
+  updateMotion();
+});
+updateMotion();
+
+const navLinks = [...document.querySelectorAll('nav a')];
+const sectionObserver = new IntersectionObserver((entries) => {
+  const current = entries.find((entry) => entry.isIntersecting);
+  if (!current) return;
+  navLinks.forEach((link) => {
+    if (link.hash === `#${current.target.id}`) link.setAttribute("aria-current", "location");
+    else link.removeAttribute("aria-current");
+  });
+}, { rootMargin: "-15% 0px -45% 0px", threshold: 0 });
+document.querySelectorAll("main > section").forEach((section) => sectionObserver.observe(section));
 
 const fromBase64 = (value) =>
   Uint8Array.from(atob(value), (character) => character.charCodeAt(0));
@@ -99,8 +128,8 @@ function renderSite(content) {
   $("#timer-label").textContent = content.relationship.label;
   $("#footer-title").textContent = content.siteTitle;
 
-  renderTimer(content.relationship.start, content.relationship.label);
   renderLocations(content.people);
+  renderTimer(content.relationship.start, content.relationship.label);
   renderStories(content.stories);
   renderProjects(content.projects);
   globeCleanup = createGlobe($("#globe"), content.people);
@@ -128,6 +157,13 @@ function renderTimer(startValue, relationshipLabel) {
     $("#hours").textContent = String(Math.floor((totalSeconds % 86400) / 3600)).padStart(2, "0");
     $("#minutes").textContent = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, "0");
     $("#seconds").textContent = String(totalSeconds % 60).padStart(2, "0");
+    document.querySelectorAll(".local-clock").forEach((clock) => {
+      const now = new Date();
+      clock.dateTime = now.toISOString();
+      clock.textContent = new Intl.DateTimeFormat("zh-CN", {
+        timeZone: clock.dataset.timezone, hour: "2-digit", minute: "2-digit", hourCycle: "h23"
+      }).format(now);
+    });
   };
 
   clearInterval(timerId);
@@ -151,6 +187,18 @@ function renderLocations(people) {
     location.textContent = `${person.city} · ${person.country}`;
     copy.append(name, location);
     card.append(dot, copy);
+    const timezone = { FIN: "Europe/Helsinki", CHN: "Asia/Shanghai" }[person.countryCode];
+    if (timezone) {
+      const clockGroup = document.createElement("div");
+      clockGroup.className = "clock-group";
+      const clock = document.createElement("time");
+      clock.className = "local-clock";
+      clock.dataset.timezone = timezone;
+      const clockLabel = document.createElement("small");
+      clockLabel.textContent = "当地时间";
+      clockGroup.append(clock, clockLabel);
+      card.append(clockGroup);
+    }
     list.append(card);
   });
 
@@ -163,19 +211,25 @@ function renderLocations(people) {
 function renderStories(stories) {
   const timeline = $("#timeline");
   timeline.replaceChildren();
-  stories.forEach((story) => {
+  stories.forEach((story, index) => {
     const article = document.createElement("article");
     article.className = "story-card";
     const time = document.createElement("time");
     time.dateTime = story.date;
     time.textContent = story.date.replaceAll("-", ".");
+    const dateGroup = document.createElement("div");
+    dateGroup.className = "story-date";
+    const chapter = document.createElement("span");
+    chapter.className = "chapter-label";
+    chapter.textContent = `CHAPTER ${String(index + 1).padStart(2, "0")}`;
+    dateGroup.append(chapter, time);
     const copy = document.createElement("div");
     const title = document.createElement("h3");
     const text = document.createElement("p");
     title.textContent = story.title;
     text.textContent = story.text;
     copy.append(title, text);
-    article.append(time, copy);
+    article.append(dateGroup, copy);
     timeline.append(article);
   });
 }
@@ -210,17 +264,36 @@ function renderProjects(projects) {
     number.textContent = String(index + 1).padStart(2, "0");
     title.textContent = project.name;
     description.textContent = project.description;
-    article.append(number, title, description);
+    const artwork = document.createElement("div");
+    artwork.className = "project-artwork";
+    artwork.setAttribute("aria-hidden", "true");
+    const orbit = document.createElement("div");
+    orbit.className = "gift-orbit";
+    const heart = document.createElement("span");
+    heart.className = "gift-heart";
+    heart.textContent = "♡";
+    const artworkLabel = document.createElement("span");
+    artworkLabel.className = "artwork-caption";
+    artworkLabel.textContent = "A LITTLE PIECE OF MY HEART";
+    artwork.append(number, orbit, heart, artworkLabel);
+    const copy = document.createElement("div");
+    copy.className = "project-copy";
+    const label = document.createElement("span");
+    label.className = "project-label";
+    label.textContent = "为你而做 · 私人收藏";
+    copy.append(label, title, description);
+    article.append(artwork, copy);
 
     try {
-      const projectUrl = new URL(project.url, location.href);
-      if (projectUrl.protocol === "http:" || projectUrl.protocol === "https:") {
+      const projectUrl = new URL(project.url || "", location.href);
+      if (project.url && (projectUrl.protocol === "http:" || projectUrl.protocol === "https:")) {
         const link = document.createElement("a");
         link.href = projectUrl.href;
         link.target = "_blank";
         link.rel = "noopener noreferrer";
         link.textContent = "打开项目 ↗";
-        article.append(link);
+        link.className = "project-link cosmic-button";
+        copy.append(link);
       }
     } catch {
       // 无效链接不显示，避免把错误地址带到页面上。
@@ -449,7 +522,7 @@ function createGlobe(canvas, people) {
       return;
     }
     context.clearRect(0, 0, width, height);
-    const drift = dragging || reducedMotion ? 0 : Math.sin(time * 0.00018) * 0.055;
+    const drift = dragging || quietMode || reducedMotion ? 0 : Math.sin(time * 0.00018) * 0.055;
     const centerX = width / 2;
     const centerY = height / 2;
 
@@ -496,7 +569,7 @@ function createGlobe(canvas, people) {
     people.forEach((person) => {
       const point = project(vectorFromCoordinates(person.latitude, person.longitude, 1.01), drift);
       if (point.z <= 0) return;
-      const pulse = reducedMotion ? 5 : 5 + Math.sin(time * 0.004) * 1.3;
+      const pulse = reducedMotion || quietMode ? 5 : 5 + Math.sin(time * 0.004) * 1.3;
       context.save();
       context.shadowColor = person.color;
       context.shadowBlur = 20;
