@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#050816" />
+    <meta name="description" content="一段跨越距离与时差的故事。" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'" />
+    <title>Our Orbit</title>
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="./styles.css" />
+    <script src="./app.js" defer></script>
+  </head>
+  <body>
+    <div class="star-field" aria-hidden="true"></div>
+
+    <section class="unlock" id="unlock" aria-labelledby="unlock-title">
+      <div class="unlock-orbit" aria-hidden="true">
+        <span></span>
+      </div>
+      <div class="unlock-card">
+        <div class="lock-mark" aria-hidden="true">✦</div>
+        <p class="overline">PRIVATE ORBIT</p>
+        <h1 id="unlock-title">进入我们的宇宙</h1>
+        <p class="unlock-copy">这段故事已经加密。请输入只有你们知道的密码。</p>
+        <form id="unlock-form">
+          <label for="password">专属密码</label>
+          <div class="password-row">
+            <input id="password" name="password" type="password" autocomplete="current-password" minlength="12" required />
+            <button type="button" class="reveal-button" id="reveal-password" aria-label="显示密码" aria-pressed="false">显示</button>
+          </div>
+          <button class="primary-button" type="submit">解锁星球</button>
+          <p class="form-status" id="form-status" role="status" aria-live="polite"></p>
+        </form>
+        <p class="security-note">内容只在你的设备中解密，密码不会被发送。</p>
+      </div>
+    </section>
+
+    <div class="site" id="site" hidden>
+      <header class="topbar">
+        <a class="brand" href="#home" id="brand">Our Orbit</a>
+        <nav aria-label="主导航">
+          <a href="#home">首页</a>
+          <a href="#story">故事</a>
+          <a href="#projects">项目</a>
+        </nav>
+        <button class="lock-button" id="lock-site" type="button">锁定</button>
+      </header>
+
+      <main>
+        <section class="hero" id="home">
+          <div class="hero-copy">
+            <p class="overline" id="hero-eyebrow"></p>
+            <h1 id="hero-title"></h1>
+            <p class="hero-message" id="hero-message"></p>
+
+            <div class="timer-panel" aria-label="恋爱时间">
+              <p class="timer-label" id="timer-label"></p>
+              <div class="timer" id="timer">
+                <div><strong id="days">0</strong><span>天</span></div>
+                <div><strong id="hours">00</strong><span>小时</span></div>
+                <div><strong id="minutes">00</strong><span>分钟</span></div>
+                <div><strong id="seconds">00</strong><span>秒</span></div>
+              </div>
+              <p class="timer-start" id="timer-start"></p>
+            </div>
+          </div>
+
+          <div class="globe-panel">
+            <div class="globe-copy">
+              <span>OUR DISTANCE</span>
+              <strong id="distance">—</strong>
+            </div>
+            <canvas id="globe" aria-label="显示两个人所在位置与连线的可旋转地球仪"></canvas>
+            <div class="location-list" id="location-list"></div>
+            <p class="globe-hint">拖动地球仪，看看我们共同生活的星球</p>
+          </div>
+        </section>
+
+        <section class="story-section" id="story">
+          <div class="section-heading">
+            <p class="overline">OUR STORY</p>
+            <h2>我们的故事</h2>
+            <p>有些日期不只是日历上的数字，它们改变了两个人的世界。</p>
+          </div>
+          <div class="timeline" id="timeline"></div>
+        </section>
+
+        <section class="projects-section" id="projects">
+          <div class="section-heading">
+            <p class="overline">MADE FOR YOU</p>
+            <h2>我为你做的项目</h2>
+            <p>每一个项目，都是我把想念变成现实的一种方式。</p>
+          </div>
+          <div class="projects-grid" id="projects-grid"></div>
+        </section>
+      </main>
+
+      <footer>
+        <p id="footer-title"></p>
+        <p>同一颗星球，同一段故事。</p>
+      </footer>
+    </div>
+  </body>
+</html>
