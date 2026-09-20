@@ -24,6 +24,7 @@ async function decryptFile(path) {
 const homepage = await decryptFile(resolve(root, "dist", "content.enc.json"));
 const content = JSON.parse(homepage.plaintext);
 const loveProject = await decryptFile(resolve(root, "dist", "projects", "love", "content.enc.json"));
+const loveProjectShell = await readFile(resolve(root, "dist", "projects", "love", "index.html"), "utf8");
 
 assert.equal(homepage.payload.algorithm, "AES-GCM");
 assert.ok(homepage.payload.iterations >= 300_000);
@@ -34,6 +35,7 @@ assert.match(content.projects[0].url, /^https:\/\//);
 assert.match(loveProject.plaintext, /<title>Love Memories · 爱的回忆<\/title>/);
 assert.equal(loveProject.payload.algorithm, "AES-GCM");
 assert.ok(loveProject.payload.iterations >= 300_000);
+assert.match(loveProjectShell, /script-src[^;]*'wasm-unsafe-eval'/);
 
 const privateTerms = [
   content.siteTitle,
