@@ -253,6 +253,21 @@ function createGlobe(canvas, people) {
   let pointerX = 0;
   let pointerY = 0;
   let moved = false;
+  let countries;
+  let disposed = false;
+  const countryCodes = new Set(people.map((person) => person.countryCode).filter(Boolean));
+  const geoProjection = d3.geoOrthographic().clipAngle(90).precision(0.5);
+  const geoPath = d3.geoPath(geoProjection, context);
+
+  fetch("./countries-110m.geojson")
+    .then((response) => {
+      if (!response.ok) throw new Error("国家地图数据加载失败");
+      return response.json();
+    })
+    .then((data) => {
+      if (!disposed) countries = data;
+    })
+    .catch(() => {});
 
   const resize = () => {
     const rectangle = canvas.getBoundingClientRect();
@@ -332,6 +347,69 @@ function createGlobe(canvas, people) {
     }
   };
 
+  const drawCountries = (drift) => {
+    if (!countries) return;
+    const degrees = 180 / Math.PI;
+    geoProjection
+      .translate([width / 2, height / 2])
+      .scale(radius)
+      .rotate([-(centerLon + drift) * degrees, -centerLat * degrees]);
+
+    context.save();
+    context.lineJoin = "round";
+    context.beginPath();
+    geoPath(countries);
+    context.fillStyle = "rgba(35, 91, 111, 0.86)";
+    context.fill();
+    context.strokeStyle = "rgba(170, 224, 222, 0.48)";
+    context.lineWidth = 0.58;
+    context.stroke();
+
+    const highlighted = countries.features.filter((feature) =>
+      countryCodes.has(feature.properties.ADM0_A3) || countryCodes.has(feature.properties.SOV_A3)
+    );
+    highlighted.forEach((feature, index) => {
+      context.beginPath();
+      geoPath(feature);
+      context.fillStyle = index === 0 ? "rgba(112, 215, 255, 0.56)" : "rgba(255, 191, 105, 0.5)";
+      context.fill();
+      context.strokeStyle = index === 0 ? "#9de7ff" : "#ffd399";
+      context.lineWidth = 1.1;
+      context.stroke();
+    });
+    context.restore();
+
+    drawCountryLabels(drift);
+  };
+
+  const drawCountryLabels = (drift) => {
+    const occupied = [];
+    const features = countries.features
+      .filter((feature) => feature.properties.LABELRANK <= 2 || countryCodes.has(feature.properties.ADM0_A3))
+      .sort((first, second) => {
+        const firstSelected = countryCodes.has(first.properties.ADM0_A3) ? 1 : 0;
+        const secondSelected = countryCodes.has(second.properties.ADM0_A3) ? 1 : 0;
+        return secondSelected - firstSelected || first.properties.LABELRANK - second.properties.LABELRANK;
+      });
+
+    features.forEach((feature) => {
+      const properties = feature.properties;
+      const point = project(vectorFromCoordinates(properties.LABEL_Y, properties.LABEL_X, 1.012), drift);
+      if (point.z < 0.24) return;
+      const selected = countryCodes.has(properties.ADM0_A3);
+      const label = properties.NAME_ZH || properties.NAME;
+      context.font = `${selected ? 700 : 500} ${selected ? 10 : 8}px Inter, "Microsoft YaHei", sans-serif`;
+      const textWidth = context.measureText(label).width;
+      const box = { x: point.x - textWidth / 2 - 3, y: point.y - 7, width: textWidth + 6, height: 12 };
+      if (occupied.some((other) => box.x < other.x + other.width && box.x + box.width > other.x && box.y < other.y + other.height && box.y + box.height > other.y)) return;
+      occupied.push(box);
+      context.fillStyle = selected ? "rgba(255, 255, 255, 0.9)" : "rgba(208, 230, 238, 0.62)";
+      context.textAlign = "center";
+      context.fillText(label, point.x, point.y + 3);
+      context.textAlign = "start";
+    });
+  };
+
   const normalized = (vector) => {
     const length = Math.hypot(vector.x, vector.y, vector.z);
     return { x: vector.x / length, y: vector.y / length, z: vector.z / length };
@@ -396,6 +474,7 @@ function createGlobe(canvas, people) {
     context.arc(centerX, centerY, radius - 1, 0, Math.PI * 2);
     context.clip();
     drawGrid(drift);
+    drawCountries(drift);
 
     context.globalCompositeOperation = "screen";
     context.shadowColor = "#ffbf69";
@@ -423,14 +502,15 @@ function createGlobe(canvas, people) {
       context.restore();
 
       context.font = '600 12px Inter, "Microsoft YaHei", sans-serif';
-      const labelWidth = context.measureText(person.city).width + 18;
+      const pointLabel = `${person.city} · ${person.country}`;
+      const labelWidth = context.measureText(pointLabel).width + 18;
       const labelX = Math.max(8, Math.min(width - labelWidth - 8, point.x + 10));
       const labelY = Math.max(22, Math.min(height - 12, point.y - 12));
       context.fillStyle = "rgba(5, 9, 24, 0.82)";
       roundedRectangle(context, labelX, labelY - 17, labelWidth, 24, 8);
       context.fill();
       context.fillStyle = "#f5f8ff";
-      context.fillText(person.city, labelX + 9, labelY);
+      context.fillText(pointLabel, labelX + 9, labelY);
     });
 
     if (!reducedMotion) frame = requestAnimationFrame(draw);
@@ -478,6 +558,7 @@ function createGlobe(canvas, people) {
   frame = requestAnimationFrame(draw);
 
   return () => {
+    disposed = true;
     cancelAnimationFrame(frame);
     observer.disconnect();
     canvas.removeEventListener("pointerdown", onPointerDown);

@@ -9,6 +9,7 @@
     <title>Our Orbit</title>
     <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
     <link rel="stylesheet" href="./styles.css" />
+    <script src="./vendor/d3.min.js" defer></script>
     <script src="./app.js" defer></script>
   </head>
   <body>
@@ -71,9 +72,9 @@
               <span>OUR DISTANCE</span>
               <strong id="distance">—</strong>
             </div>
-            <canvas id="globe" aria-label="显示两个人所在位置与连线的可旋转地球仪"></canvas>
+            <canvas id="globe" aria-label="显示真实国家边界、国家名称以及两个人所在位置与连线的可旋转地球仪"></canvas>
             <div class="location-list" id="location-list"></div>
-            <p class="globe-hint">拖动地球仪，看看我们共同生活的星球</p>
+            <p class="globe-hint">拖动查看国家地区 · 双击回到我们的位置</p>
           </div>
         </section>
 

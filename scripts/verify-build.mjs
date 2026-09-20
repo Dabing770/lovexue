@@ -26,9 +26,11 @@ const privateTerms = [
   ...content.people.flatMap((person) => [person.name, person.city]),
   ...content.stories.flatMap((story) => [story.title, story.text])
 ];
-const publicFiles = (await readdir(resolve(root, "dist"))).filter((name) => name !== "content.enc.json");
+const publicFiles = (await readdir(resolve(root, "dist"), { recursive: true, withFileTypes: true }))
+  .filter((entry) => entry.isFile() && entry.name !== "content.enc.json")
+  .map((entry) => resolve(entry.parentPath, entry.name));
 const publicText = (
-  await Promise.all(publicFiles.map((name) => readFile(resolve(root, "dist", name), "utf8")))
+  await Promise.all(publicFiles.map((path) => readFile(path, "utf8")))
 ).join("\n");
 
 for (const term of privateTerms) {
