@@ -327,6 +327,8 @@ function createGlobe(canvas, people) {
   let height = 0;
   let radius = 0;
   let frame;
+  let spin = 0;
+  let previousTime;
   let dragging = false;
   let pointerX = 0;
   let pointerY = 0;
@@ -522,7 +524,10 @@ function createGlobe(canvas, people) {
       return;
     }
     context.clearRect(0, 0, width, height);
-    const drift = dragging || quietMode || reducedMotion ? 0 : Math.sin(time * 0.00036) * 0.055;
+    const elapsed = previousTime === undefined ? 0 : Math.min(time - previousTime, 100);
+    previousTime = time;
+    if (!dragging && !quietMode && !reducedMotion) spin = (spin + elapsed * Math.PI * 2 / 5000) % (Math.PI * 2);
+    const drift = spin;
     const centerX = width / 2;
     const centerY = height / 2;
 
