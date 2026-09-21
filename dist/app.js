@@ -522,7 +522,7 @@ function createGlobe(canvas, people) {
       return;
     }
     context.clearRect(0, 0, width, height);
-    const drift = dragging || quietMode || reducedMotion ? 0 : Math.sin(time * 0.00018) * 0.055;
+    const drift = dragging || quietMode || reducedMotion ? 0 : Math.sin(time * 0.00036) * 0.055;
     const centerX = width / 2;
     const centerY = height / 2;
 
