@@ -526,7 +526,7 @@ function createGlobe(canvas, people) {
     context.clearRect(0, 0, width, height);
     const elapsed = previousTime === undefined ? 0 : Math.min(time - previousTime, 100);
     previousTime = time;
-    if (!dragging && !quietMode && !reducedMotion) spin = (spin + elapsed * Math.PI * 2 / 5000) % (Math.PI * 2);
+    if (!dragging && !quietMode && !reducedMotion) spin = (spin + elapsed * Math.PI * 2 / 10000) % (Math.PI * 2);
     const drift = spin;
     const centerX = width / 2;
     const centerY = height / 2;
