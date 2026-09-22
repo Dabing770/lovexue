@@ -8,8 +8,7 @@ const privateDir = resolve(root, ".private");
 const contentPath = resolve(privateDir, "content.json");
 const passwordPath = resolve(privateDir, "password.txt");
 const outputPath = resolve(root, "dist", "content.enc.json");
-const loveProjectPath = resolve(privateDir, "projects", "love.html");
-const loveProjectOutputPath = resolve(root, "dist", "projects", "love", "content.enc.json");
+const projects = ["love", "letters"];
 const iterations = 310_000;
 
 await mkdir(privateDir, { recursive: true });
@@ -52,5 +51,8 @@ async function encryptFile(sourcePath, destinationPath) {
 const content = await readFile(contentPath);
 JSON.parse(content.toString("utf8"));
 await encryptFile(contentPath, outputPath);
-await encryptFile(loveProjectPath, loveProjectOutputPath);
+await Promise.all(projects.map((project) => encryptFile(
+  resolve(privateDir, "projects", `${project}.html`),
+  resolve(root, "dist", "projects", project, "content.enc.json")
+)));
 console.log("主页和项目密文已更新，可以安全发布 dist 文件夹。");

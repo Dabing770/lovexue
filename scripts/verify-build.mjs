@@ -24,25 +24,39 @@ async function decryptFile(path) {
 const homepage = await decryptFile(resolve(root, "dist", "content.enc.json"));
 const content = JSON.parse(homepage.plaintext);
 const loveProject = await decryptFile(resolve(root, "dist", "projects", "love", "content.enc.json"));
+const lettersProject = await decryptFile(resolve(root, "dist", "projects", "letters", "content.enc.json"));
 const loveProjectShell = await readFile(resolve(root, "dist", "projects", "love", "index.html"), "utf8");
+const lettersProjectShell = await readFile(resolve(root, "dist", "projects", "letters", "index.html"), "utf8");
 
 assert.equal(homepage.payload.algorithm, "AES-GCM");
 assert.ok(homepage.payload.iterations >= 300_000);
 assert.equal(content.people.length, 2);
 assert.ok(content.stories.length >= 1);
-assert.equal(content.projects.length, 1);
-assert.match(content.projects[0].url, /^https:\/\//);
+assert.equal(content.projects.length, 2);
+content.projects.forEach((project) => assert.match(project.url, /^https:\/\//));
 assert.match(loveProject.plaintext, /<title>Love Memories · 爱的回忆<\/title>/);
 assert.equal(loveProject.payload.algorithm, "AES-GCM");
 assert.ok(loveProject.payload.iterations >= 300_000);
 assert.match(loveProjectShell, /script-src[^;]*'wasm-unsafe-eval'/);
+assert.match(lettersProject.plaintext, /<title>见字如面 · 写给雪儿的信<\/title>/);
+assert.match(lettersProject.plaintext, /亲爱的雪儿，见字如面。/);
+assert.match(lettersProject.plaintext, /不管将来什么时候再读这封信/);
+assert.match(lettersProject.plaintext, /OvO 还没想好写什么呢/);
+assert.doesNotMatch(lettersProject.plaintext, /写给你的九封信/);
+assert.equal((lettersProject.plaintext.match(/\n\s+title: "/g) || []).length, 2);
+assert.equal(lettersProject.payload.algorithm, "AES-GCM");
+assert.ok(lettersProject.payload.iterations >= 300_000);
+assert.match(lettersProjectShell, /script-src[^;]*'unsafe-inline'/);
 
 const privateTerms = [
   content.siteTitle,
   ...content.people.flatMap((person) => [person.name, person.city]),
   ...content.stories.flatMap((story) => [story.title, story.text]),
   ...content.projects.flatMap((project) => [project.name, project.description]),
-  "<h1>Our Love</h1>"
+  "<h1>Our Love</h1>",
+  "亲爱的雪儿，见字如面。",
+  "不管将来什么时候再读这封信",
+  "OvO 还没想好写什么呢"
 ];
 const publicFiles = (await readdir(resolve(root, "dist"), { recursive: true, withFileTypes: true }))
   .filter((entry) => entry.isFile() && entry.name !== "content.enc.json")

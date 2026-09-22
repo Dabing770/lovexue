@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#070b18" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; object-src 'none'; base-uri 'self'; form-action 'self'" />
+    <title>加密项目 · Our Orbit</title>
+    <link rel="stylesheet" href="../love/unlock.css?v=20260920-ui" />
+    <script src="../love/loader.js" defer></script>
+  </head>
+  <body>
+    <div class="sky-orbit orbit-one" aria-hidden="true"></div>
+    <div class="sky-orbit orbit-two" aria-hidden="true"></div>
+    <header class="page-header">
+      <a class="brand" href="../../" aria-label="Our Orbit，返回主页">
+        <svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="9"/><ellipse cx="20" cy="20" rx="19" ry="7" transform="rotate(-35 20 20)"/><circle class="brand-star" cx="33" cy="11" r="2.5"/></svg>
+        OUR ORBIT
+      </a>
+      <span class="privacy-pill"><span aria-hidden="true"></span> 仅属于我们</span>
+    </header>
+    <main aria-labelledby="project-title">
+      <div class="card-glow" aria-hidden="true"></div>
+      <div class="heart-planet" aria-hidden="true">
+        <div class="planet-ring"></div>
+        <div class="planet-core"><svg viewBox="0 0 48 48"><path d="M8 12h32v24H8zM8 13l16 13 16-13"/></svg></div>
+        <span class="planet-star">✧</span>
+      </div>
+      <p class="eyebrow">WORDS KEPT SAFE, JUST FOR US</p>
+      <h1 id="project-title">打开写给你的信</h1>
+      <p class="intro">有些话，被我认真放进了信封里。<br />输入密码，再一封一封慢慢打开。</p>
+      <div class="card-divider" aria-hidden="true"><span>✦</span></div>
+      <form id="unlock-form">
+        <label for="password">专属密码</label>
+        <div class="password-row">
+          <svg class="input-lock" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10" width="14" height="11" rx="3"/><path d="M8 10V7a4 4 0 0 1 8 0v3M12 14v3"/></svg>
+          <input id="password" type="password" autocomplete="current-password" minlength="12" required autofocus placeholder="输入与主页相同的密码" aria-describedby="password-hint" />
+          <span class="input-border" aria-hidden="true"></span>
+          <button id="reveal" type="button" aria-pressed="false">显示</button>
+        </div>
+        <p id="password-hint" class="password-hint">用我们共同的密码，拆开这些只写给你的信。</p>
+        <button id="unlock" type="submit">
+          <span class="button-stars" aria-hidden="true"></span>
+          <span class="button-glow" aria-hidden="true"><span></span><span></span></span>
+          <span class="button-spark" aria-hidden="true">✦</span><span class="button-label">解锁信件</span><span class="button-arrow" aria-hidden="true">↗</span>
+        </button>
+        <p id="status" role="status" aria-live="polite"></p>
+      </form>
+      <a class="back-link" href="../../"><span aria-hidden="true">←</span> 返回我们的星球</a>
+    </main>
+    <footer class="page-footer">同一片星空，同一份心动。<span aria-hidden="true">✧</span></footer>
+  </body>
+</html>
