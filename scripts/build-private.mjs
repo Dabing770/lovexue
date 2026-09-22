@@ -22,8 +22,8 @@ try {
   console.log("已在本机创建密码文件；密码不会写入发布目录。");
 }
 
-if (password.length < 12) {
-  throw new Error("密码至少需要 12 个字符；建议使用 16 个以上随机字符。 ");
+if (!password) {
+  throw new Error("密码不能为空。");
 }
 
 async function encryptFile(sourcePath, destinationPath) {

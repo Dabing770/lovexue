@@ -68,5 +68,6 @@ const publicText = (
 for (const term of privateTerms) {
   assert.ok(!publicText.includes(term), `发布文件中发现私人明文：${term}`);
 }
+assert.doesNotMatch(publicText, /minlength="12"/);
 
 console.log("验证通过：主页与项目密文可解密，发布文件未发现指定私人明文。");

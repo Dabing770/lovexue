@@ -6,7 +6,7 @@
 
 1. 修改 `.private/content.json` 中的故事、地点和项目。
 2. 第一次运行 `node scripts/build-private.mjs` 会在 `.private/password.txt` 创建随机密码。
-3. 如需自定义密码，修改 `.private/password.txt`，密码至少 12 个字符，建议 16 个以上。
+3. 如需自定义密码，修改 `.private/password.txt`。密码可以是任意非空字符；为了安全，仍建议使用较长密码。
 4. 再次运行 `node scripts/build-private.mjs`，生成新的 `dist/content.enc.json`。
 
 `.private` 文件夹不会进入 Git；不要把其中的内容、密码或私人照片提交到公开仓库。
