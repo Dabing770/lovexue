@@ -612,8 +612,8 @@ function createGlobe(canvas, people) {
     const deltaX = event.clientX - pointerX;
     const deltaY = event.clientY - pointerY;
     moved ||= Math.abs(deltaX) + Math.abs(deltaY) > 2;
-    centerLon -= deltaX * 0.008;
-    centerLat = Math.max(-1.15, Math.min(1.15, centerLat + deltaY * 0.006));
+    centerLon -= deltaX / radius;
+    centerLat = Math.max(-1.15, Math.min(1.15, centerLat + deltaY / radius));
     pointerX = event.clientX;
     pointerY = event.clientY;
     if (reducedMotion) draw(performance.now());
@@ -629,6 +629,9 @@ function createGlobe(canvas, people) {
     centerLat = toRadians(midpointLat);
     if (reducedMotion) draw(performance.now());
   };
+
+  const resetButton = $("#globe-reset");
+  resetButton.addEventListener("click", onDoubleClick);
 
   const observer = new ResizeObserver(resize);
   observer.observe(canvas);
@@ -649,6 +652,7 @@ function createGlobe(canvas, people) {
     canvas.removeEventListener("pointerup", onPointerUp);
     canvas.removeEventListener("pointercancel", onPointerUp);
     canvas.removeEventListener("dblclick", onDoubleClick);
+    resetButton.removeEventListener("click", onDoubleClick);
   };
 }
 
