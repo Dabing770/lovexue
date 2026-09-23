@@ -104,7 +104,8 @@ input::placeholder { color: #818ba6; font-size: 12px; }
 @keyframes button-stars { to { transform: translateY(-74px); } }
 @keyframes button-pulse { 50% { transform: scale(.75); opacity: .7; } }
 @media (max-width: 540px) {
-  body { padding: 21px 20px; }
+  body { padding: max(21px, env(safe-area-inset-top)) max(20px, env(safe-area-inset-right)) max(21px, env(safe-area-inset-bottom)) max(20px, env(safe-area-inset-left)); }
+  input { font-size: 16px; }
   .brand { font-size: 11px; gap: 9px; letter-spacing: .16em; }
   .brand svg { width: 28px; height: 28px; }
   .privacy-pill { font-size: 10px; padding: 7px 10px; }
