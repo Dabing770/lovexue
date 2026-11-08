@@ -74,6 +74,8 @@ label { display: block; margin-bottom: 10px; font-size: 12px; color: #c6d3e8; }
 
 .site { animation: site-in .65s ease both; }
 @keyframes site-in { from { opacity: 0; } to { opacity: 1; } }
+/* 静谧模式会暂停所有动画；淡入被暂停时页面会停在透明状态，因此这里直接取消。 */
+:root[data-motion="quiet"] .site { animation: none; }
 .topbar { position: sticky; top: 0; z-index: 20; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 20px; width: 100%; margin: 0; padding: 22px max(40px, calc((100% - 1280px) / 2)); background: #070b18df; backdrop-filter: blur(20px); border-bottom: 1px solid #a7bed40c; }
 .brand { display: flex; align-items: center; gap: 12px; text-decoration: none; font-size: 15px; letter-spacing: .02em; }
 .brand-symbol { font-size: 35px; line-height: 1; color: var(--pink); }

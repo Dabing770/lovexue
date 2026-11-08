@@ -100,21 +100,37 @@ form.addEventListener("submit", async (event) => {
   }
 });
 
-$("#reveal-password").addEventListener("click", (event) => {
-  const showing = passwordInput.type === "text";
-  passwordInput.type = showing ? "password" : "text";
-  event.currentTarget.textContent = showing ? "显示" : "隐藏";
-  event.currentTarget.setAttribute("aria-pressed", String(!showing));
-  event.currentTarget.setAttribute("aria-label", showing ? "显示密码" : "隐藏密码");
+function setPasswordVisible(visible) {
+  const button = $("#reveal-password");
+  passwordInput.type = visible ? "text" : "password";
+  button.textContent = visible ? "隐藏" : "显示";
+  button.setAttribute("aria-pressed", String(visible));
+  button.setAttribute("aria-label", visible ? "隐藏密码" : "显示密码");
+}
+
+$("#reveal-password").addEventListener("click", () => {
+  setPasswordVisible(passwordInput.type !== "text");
   passwordInput.focus();
 });
+
+function clearSite() {
+  document.title = "Our Orbit";
+  $("#brand").textContent = "Our Orbit";
+  ["#hero-eyebrow", "#hero-title", "#hero-message", "#timer-label", "#timer-start", "#footer-title", "#distance"]
+    .forEach((selector) => { $(selector).textContent = ""; });
+  $("#days").textContent = "0";
+  ["#hours", "#minutes", "#seconds"].forEach((selector) => { $(selector).textContent = "00"; });
+  ["#location-list", "#timeline", "#projects-grid"].forEach((selector) => $(selector).replaceChildren());
+}
 
 $("#lock-site").addEventListener("click", () => {
   clearInterval(timerId);
   globeCleanup?.();
+  clearSite();
   site.hidden = true;
   unlock.hidden = false;
   status.textContent = "";
+  setPasswordVisible(false);
   passwordInput.focus();
   window.scrollTo({ top: 0 });
 });
@@ -345,7 +361,10 @@ function createGlobe(canvas, people) {
       return response.json();
     })
     .then((data) => {
-      if (!disposed) countries = data;
+      if (disposed) return;
+      countries = data;
+      // 减少动效模式下没有动画循环，地图数据到达后要手动重绘。
+      if (reducedMotion) draw(performance.now());
     })
     .catch(() => {});
 
@@ -646,6 +665,7 @@ function createGlobe(canvas, people) {
   return () => {
     disposed = true;
     cancelAnimationFrame(frame);
+    context.clearRect(0, 0, width, height);
     observer.disconnect();
     canvas.removeEventListener("pointerdown", onPointerDown);
     canvas.removeEventListener("pointermove", onPointerMove);

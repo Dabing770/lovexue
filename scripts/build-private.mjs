@@ -26,8 +26,7 @@ if (!password) {
   throw new Error("密码不能为空。");
 }
 
-async function encryptFile(sourcePath, destinationPath) {
-  const plaintext = await readFile(sourcePath);
+function encrypt(plaintext) {
   const salt = randomBytes(16);
   const iv = randomBytes(12);
   const key = pbkdf2Sync(password, salt, iterations, 32, "sha256");
@@ -44,15 +43,21 @@ async function encryptFile(sourcePath, destinationPath) {
     data: Buffer.concat([ciphertext, tag]).toString("base64")
   };
 
-  await mkdir(dirname(destinationPath), { recursive: true });
-  await writeFile(destinationPath, `${JSON.stringify(payload)}\n`, "utf8");
+  return `${JSON.stringify(payload)}\n`;
 }
 
+// 全部读取并加密成功后才写入，避免源文件缺失时 dist 只更新一半。
 const content = await readFile(contentPath);
 JSON.parse(content.toString("utf8"));
-await encryptFile(contentPath, outputPath);
-await Promise.all(projects.map((project) => encryptFile(
-  resolve(privateDir, "projects", `${project}.html`),
-  resolve(root, "dist", "projects", project, "content.enc.json")
-)));
+const outputs = [[outputPath, encrypt(content)]];
+for (const project of projects) {
+  outputs.push([
+    resolve(root, "dist", "projects", project, "content.enc.json"),
+    encrypt(await readFile(resolve(privateDir, "projects", `${project}.html`)))
+  ]);
+}
+await Promise.all(outputs.map(async ([destinationPath, text]) => {
+  await mkdir(dirname(destinationPath), { recursive: true });
+  await writeFile(destinationPath, text, "utf8");
+}));
 console.log("主页和项目密文已更新，可以安全发布 dist 文件夹。");
